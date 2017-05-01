@@ -1,0 +1,16 @@
+*.iml
+.gradle
+/local.properties
+.DS_Store
+/build
+/captures
+.idea/
+jsoncloud/libs/
+jsoncloud/proguard-rules.pro
+jsoncloud/src/androidTest/
+jsoncloud/src/test/
+doc/
+gradle.properties
+gradle/
+gradlew
+gradlew.bat

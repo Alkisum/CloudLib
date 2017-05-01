@@ -1,4 +1,4 @@
-package com.alkisum.android.jsoncloud.net;
+package com.alkisum.android.cloudops.net;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,8 +12,8 @@ import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.EditText;
 
-import com.alkisum.android.jsoncloud.R;
-import com.alkisum.android.jsoncloud.utils.CloudPref;
+import com.alkisum.android.cloudops.R;
+import com.alkisum.android.cloudops.utils.CloudPref;
 
 /**
  * Dialog to connect to a ownCloud server.

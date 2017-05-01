@@ -1,12 +1,12 @@
-package com.alkisum.android.jsoncloud.net.owncloud;
+package com.alkisum.android.cloudops.net.owncloud;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
 
-import com.alkisum.android.jsoncloud.file.json.JsonFile;
-import com.alkisum.android.jsoncloud.file.json.JsonFileWriter;
+import com.alkisum.android.cloudops.file.json.JsonFile;
+import com.alkisum.android.cloudops.file.json.JsonFileWriter;
 import com.owncloud.android.lib.common.OwnCloudClient;
 import com.owncloud.android.lib.common.OwnCloudClientFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;

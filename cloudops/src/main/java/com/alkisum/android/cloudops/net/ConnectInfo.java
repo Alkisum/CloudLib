@@ -1,4 +1,4 @@
-package com.alkisum.android.jsoncloud.net;
+package com.alkisum.android.cloudops.net;
 
 /**
  * Class containing connection information for ownCloud server.

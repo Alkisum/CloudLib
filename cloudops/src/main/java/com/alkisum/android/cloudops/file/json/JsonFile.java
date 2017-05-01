@@ -1,4 +1,4 @@
-package com.alkisum.android.jsoncloud.file.json;
+package com.alkisum.android.cloudops.file.json;
 
 import org.json.JSONObject;
 

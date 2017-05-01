@@ -1,4 +1,4 @@
-package com.alkisum.android.jsoncloud.utils;
+package com.alkisum.android.cloudops.utils;
 
 /**
  * Class defining constants for SharedPreferences.

@@ -8,7 +8,7 @@ import java.io.File;
  * Class defining a JSON file.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class JsonFile {
@@ -22,6 +22,11 @@ public class JsonFile {
      * File name.
      */
     private final String name;
+
+    /**
+     * File base name (file name without extension).
+     */
+    private final String baseName;
 
     /**
      * JSON object contained in the file.
@@ -41,6 +46,7 @@ public class JsonFile {
      */
     public JsonFile(final String name, final JSONObject jsonObject) {
         this.name = name;
+        this.baseName = name.replaceFirst("[.][^.]+$", "");
         this.jsonObject = jsonObject;
     }
 
@@ -51,9 +57,10 @@ public class JsonFile {
      * @param jsonObject JSON object contained in the file
      * @param file       File object
      */
-    public JsonFile(final String name, final JSONObject jsonObject,
+    JsonFile(final String name, final JSONObject jsonObject,
                     final File file) {
         this.name = name;
+        this.baseName = name.replaceFirst("[.][^.]+$", "");
         this.jsonObject = jsonObject;
         this.file = file;
     }
@@ -63,6 +70,13 @@ public class JsonFile {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return File base name (file name without extension).
+     */
+    final String getBaseName() {
+        return baseName;
     }
 
     /**

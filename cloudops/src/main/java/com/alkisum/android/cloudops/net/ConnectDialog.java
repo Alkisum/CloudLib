@@ -19,7 +19,7 @@ import com.alkisum.android.cloudops.utils.CloudPref;
  * Dialog to connect to a ownCloud server.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -83,12 +83,15 @@ public class ConnectDialog extends DialogFragment {
     public final void onAttach(final Context context) {
         super.onAttach(context);
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        try {
-            callback = (ConnectDialogListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName()
-                    + " must implement ConnectDialogListener");
-        }
+    }
+
+    /**
+     * Set the ConnectDialogListener.
+     *
+     * @param callback ConnectDialogListener instance
+     */
+    public final void setCallback(final ConnectDialogListener callback) {
+        this.callback = callback;
     }
 
     @NonNull
@@ -122,7 +125,9 @@ public class ConnectDialog extends DialogFragment {
                                         usernameEditText.getText().toString(),
                                         passwordEditText.getText().toString()
                                 );
-                                callback.onSubmit(operation, info);
+                                if (callback != null) {
+                                    callback.onSubmit(operation, info);
+                                }
 
                                 if (sharedPref.getBoolean(
                                         CloudPref.SAVE_OWNCLOUD_INFO, false)) {

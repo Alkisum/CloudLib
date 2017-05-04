@@ -24,7 +24,7 @@ import java.util.Queue;
  * Class uploading files to the ownCloud server.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class OcUploader implements OnRemoteOperationListener,
@@ -38,7 +38,7 @@ public class OcUploader implements OnRemoteOperationListener,
     /**
      * Queue of JSON files to upload.
      */
-    private Queue<JsonFile> jsonFiles;
+    private final Queue<JsonFile> jsonFiles;
 
     /**
      * Context.
@@ -48,7 +48,7 @@ public class OcUploader implements OnRemoteOperationListener,
     /**
      * Listener for the upload task.
      */
-    private UploaderListener callback;
+    private final OcUploaderListener callback;
 
     /**
      * Path on the server where to upload the file.
@@ -63,24 +63,21 @@ public class OcUploader implements OnRemoteOperationListener,
     /**
      * Handler for the operation on the ownCloud server.
      */
-    private Handler handler;
+    private final Handler handler;
 
     /**
      * OcUploader constructor.
      *
      * @param context   Context
+     * @param callback  OcUploaderListener instance
      * @param jsonFiles Queue of json files to upload
      */
-    public OcUploader(final Context context, final Queue<JsonFile> jsonFiles) {
+    public OcUploader(final Context context, final OcUploaderListener callback,
+                      final Queue<JsonFile> jsonFiles) {
         this.context = context;
-        try {
-            callback = (UploaderListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName()
-                    + " must implement UploaderListener");
-        }
+        this.callback = callback;
         this.jsonFiles = jsonFiles;
-        handler = new Handler();
+        this.handler = new Handler();
     }
 
     /**
@@ -163,7 +160,7 @@ public class OcUploader implements OnRemoteOperationListener,
             remotePath = remotePath + FileUtils.PATH_SEPARATOR;
         }
         // Add the file name to the remote path
-        return remotePath + jsonFile.getName() + JsonFile.FILE_EXT;
+        return remotePath + jsonFile.getName();
     }
 
     @Override
@@ -206,7 +203,7 @@ public class OcUploader implements OnRemoteOperationListener,
     /**
      * Listener to get notification from the OcUploader tasks.
      */
-    public interface UploaderListener {
+    public interface OcUploaderListener {
 
         /**
          * Called when the JSON file could not have been written.

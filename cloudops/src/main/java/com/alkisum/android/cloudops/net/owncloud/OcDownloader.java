@@ -29,7 +29,7 @@ import java.util.Queue;
  * Class downloading files from an ownCloud server.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class OcDownloader implements OnRemoteOperationListener,
@@ -48,7 +48,7 @@ public class OcDownloader implements OnRemoteOperationListener,
     /**
      * Listener for the download task.
      */
-    private OcDownloaderListener callback;
+    private final OcDownloaderListener callback;
 
     /**
      * Remote path to use to download the files.
@@ -63,7 +63,7 @@ public class OcDownloader implements OnRemoteOperationListener,
     /**
      * Handler for the operation on the ownCloud server.
      */
-    private Handler handler;
+    private final Handler handler;
 
     /**
      * Queue of remote files to download.
@@ -79,16 +79,13 @@ public class OcDownloader implements OnRemoteOperationListener,
      * OcDownloader constructor.
      *
      * @param context Context
+     * @param callback OcDownloaderListener instance
      */
-    public OcDownloader(final Context context) {
+    public OcDownloader(final Context context,
+                        final OcDownloaderListener callback) {
         this.context = context;
-        try {
-            callback = (OcDownloaderListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.getClass().getSimpleName()
-                    + " must implement OcDownloaderListener");
-        }
-        handler = new Handler();
+        this.callback = callback;
+        this.handler = new Handler();
     }
 
     /**

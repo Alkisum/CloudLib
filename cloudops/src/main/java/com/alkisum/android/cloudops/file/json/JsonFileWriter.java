@@ -14,7 +14,7 @@ import java.util.Queue;
  * Task writing JSON objects into files.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.1
  * @since 1.0
  */
 public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
@@ -60,7 +60,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
         try {
             for (JsonFile jsonFile : jsonFiles) {
                 // Create temporary file, its name does not matter
-                File file = File.createTempFile("_" + jsonFile.getName(),
+                File file = File.createTempFile("_" + jsonFile.getBaseName(),
                         JsonFile.FILE_EXT, context.getCacheDir());
 
                 FileWriter writer = new FileWriter(file);

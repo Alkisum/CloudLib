@@ -1,6 +1,6 @@
 # CloudOps
 
-CloudOps is library for Android that simplifies file operations for file hosting services.
+CloudOps is a library for Android that simplifies file operations for file hosting services.
 
 
 ## Requirements
@@ -11,6 +11,7 @@ CloudOps is library for Android that simplifies file operations for file hosting
 ## Supported services
 
 + ownCloud
++ Nextcloud
 
 
 ## Used by

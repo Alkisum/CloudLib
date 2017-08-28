@@ -10,4 +10,12 @@
     <string name="connect_hint_username">Username</string>
     <string name="connect_hint_password">Password</string>
 
+    <!-- OcDownloader -->
+    <string name="downloader_downloading">Downloading&#160;</string>
+    <string name="downloader_complete">Download complete</string>
+
+    <!-- OcUploader -->
+    <string name="uploader_uploading">Uploading&#160;</string>
+    <string name="uploader_complete">Upload complete</string>
+
 </resources>

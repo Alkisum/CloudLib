@@ -1,15 +1,14 @@
 package com.alkisum.android.cloudops.net.owncloud;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
+import com.alkisum.android.cloudops.R;
+import com.alkisum.android.cloudops.events.DownloadEvent;
 import com.alkisum.android.cloudops.file.json.JsonFile;
-import com.alkisum.android.cloudops.file.json.JsonFileReader;
-import com.owncloud.android.lib.common.OwnCloudClient;
-import com.owncloud.android.lib.common.OwnCloudClientFactory;
-import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
+import com.alkisum.android.cloudops.utils.OcUtils;
 import com.owncloud.android.lib.common.network.OnDatatransferProgressListener;
 import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
@@ -18,6 +17,8 @@ import com.owncloud.android.lib.resources.files.DownloadRemoteFileOperation;
 import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
 import com.owncloud.android.lib.resources.files.RemoteFile;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,11 +30,11 @@ import java.util.Queue;
  * Class downloading files from an ownCloud server.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
-public class OcDownloader implements OnRemoteOperationListener,
-        OnDatatransferProgressListener, JsonFileReader.JsonFileReaderListener {
+public class OcDownloader extends OcOperator implements
+        OnRemoteOperationListener, OnDatatransferProgressListener {
 
     /**
      * Log tag.
@@ -41,29 +42,14 @@ public class OcDownloader implements OnRemoteOperationListener,
     private static final String TAG = "OcDownloader";
 
     /**
-     * Context.
+     * Subscriber ids allowed to process the events.
      */
-    private final Context context;
-
-    /**
-     * Listener for the download task.
-     */
-    private final OcDownloaderListener callback;
+    private Integer[] subscriberIds;
 
     /**
      * Remote path to use to download the files.
      */
     private String remotePath;
-
-    /**
-     * OwnCloud client.
-     */
-    private OwnCloudClient client;
-
-    /**
-     * Handler for the operation on the ownCloud server.
-     */
-    private final Handler handler;
 
     /**
      * Queue of remote files to download.
@@ -76,16 +62,32 @@ public class OcDownloader implements OnRemoteOperationListener,
     private List<File> localFiles;
 
     /**
+     * List of file names to exclude when downloading remote files.
+     */
+    private List<String> excludeFileNames;
+
+    /**
+     * Number of files to download.
+     */
+    private int totalRemoteFiles;
+
+    /**
+     * EventBus instance.
+     */
+    private EventBus eventBus = EventBus.getDefault();
+
+    /**
      * OcDownloader constructor.
      *
-     * @param context Context
-     * @param callback OcDownloaderListener instance
+     * @param context       Context
+     * @param intent        Intent for notification, null if no intent needed
+     * @param subscriberIds Subscriber ids allowed to process the events
      */
-    public OcDownloader(final Context context,
-                        final OcDownloaderListener callback) {
-        this.context = context;
-        this.callback = callback;
-        this.handler = new Handler();
+    public OcDownloader(final Context context, final Intent intent,
+                        final Integer[] subscriberIds) {
+        super(context, intent, "ocDownloaderNotification",
+                android.R.drawable.stat_sys_download);
+        this.subscriberIds = subscriberIds;
     }
 
     /**
@@ -95,20 +97,19 @@ public class OcDownloader implements OnRemoteOperationListener,
      * @param path     Remote path
      * @param username Username
      * @param password Password
-     * @return Current instance of the downloader
      */
-    public final OcDownloader init(final String address, final String path,
-                                   final String username,
-                                   final String password) {
+    public final void init(final String address, final String path,
+                           final String username, final String password) {
         remotePath = buildRemotePath(path);
+        super.init(address, username, password);
+    }
 
-        Uri serverUri = Uri.parse(address);
-        client = OwnCloudClientFactory.createOwnCloudClient(
-                serverUri, context, true);
-        client.setCredentials(OwnCloudCredentialsFactory.newBasicCredentials(
-                username, password));
-
-        return this;
+    /**
+     * @param excludeFileNames List of file names to exclude when downloading
+     *                         remote files
+     */
+    public final void setExcludeFileNames(final List<String> excludeFileNames) {
+        this.excludeFileNames = excludeFileNames;
     }
 
     /**
@@ -124,7 +125,7 @@ public class OcDownloader implements OnRemoteOperationListener,
     private void getRemoteFiles() {
         ReadRemoteFolderOperation readOperation =
                 new ReadRemoteFolderOperation(remotePath);
-        readOperation.execute(client, this, handler);
+        readOperation.execute(getClient(), this, getHandler());
     }
 
     /**
@@ -133,16 +134,15 @@ public class OcDownloader implements OnRemoteOperationListener,
      * @param file Remote file
      */
     private void download(final RemoteFile file) {
-        callback.onDownloadStart(file);
-
-        File localFile = new File(context.getCacheDir(), file.getRemotePath());
+        File localFile = new File(getContext().getCacheDir(),
+                file.getRemotePath());
         localFiles.add(localFile);
 
         DownloadRemoteFileOperation downloadOperation =
                 new DownloadRemoteFileOperation(file.getRemotePath(),
-                        context.getCacheDir().getAbsolutePath());
+                        getContext().getCacheDir().getAbsolutePath());
         downloadOperation.addDatatransferProgressListener(this);
-        downloadOperation.execute(client, this, handler);
+        downloadOperation.execute(getClient(), this, getHandler());
     }
 
     @Override
@@ -156,13 +156,10 @@ public class OcDownloader implements OnRemoteOperationListener,
         } else {
             percentage = 0;
         }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "Downloading... (" + percentage + "%)");
-                callback.onDownloading(percentage);
-            }
-        });
+        getNotifier().setTitle(getContext().getString(
+                R.string.downloader_downloading) + fileName);
+        getNotifier().setProgress(percentage);
+        getNotifier().show();
     }
 
     @Override
@@ -177,7 +174,8 @@ public class OcDownloader implements OnRemoteOperationListener,
             }
         } else {
             Log.e(TAG, result.getLogMessage(), result.getException());
-            callback.onDownloadFailed(result.getLogMessage());
+            eventBus.post(new DownloadEvent(subscriberIds, DownloadEvent.ERROR,
+                    result.getLogMessage()));
         }
     }
 
@@ -191,16 +189,21 @@ public class OcDownloader implements OnRemoteOperationListener,
         localFiles = new ArrayList<>();
         for (Object obj : result.getData()) {
             RemoteFile remoteFile = (RemoteFile) obj;
-            String fileName = getRemoteFileName(remoteFile);
-            if (fileName.endsWith(JsonFile.FILE_EXT)) {
+            String fileName = OcUtils.getRemoteFileName(remoteFile);
+            if (fileName.endsWith(JsonFile.FILE_EXT)
+                    && !excludeFileNames.contains(fileName)) {
                 remoteFiles.add(remoteFile);
             }
         }
+        totalRemoteFiles = remoteFiles.size();
         RemoteFile remoteFile = remoteFiles.poll();
         if (remoteFile != null) {
+            getNotifier().setText((totalRemoteFiles - remoteFiles.size())
+                    + "/" + totalRemoteFiles);
             download(remoteFile);
         } else {
-            callback.onNoFileToDownload();
+            eventBus.post(new DownloadEvent(subscriberIds,
+                    DownloadEvent.NO_FILE));
         }
     }
 
@@ -210,26 +213,27 @@ public class OcDownloader implements OnRemoteOperationListener,
     private void onDownloadRemoteFileFinish() {
         RemoteFile remoteFile = remoteFiles.poll();
         if (remoteFile != null) {
+            getNotifier().setText((totalRemoteFiles - remoteFiles.size())
+                    + "/" + totalRemoteFiles);
             download(remoteFile);
+            eventBus.post(new DownloadEvent(subscriberIds,
+                    DownloadEvent.DOWNLOADING));
         } else {
-            if (localFiles.isEmpty()) {
-                callback.onNoFileToDownload();
-            } else {
-                callback.onAllDownloadComplete();
-                new JsonFileReader(this, localFiles).execute();
-            }
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getNotifier().setIcon(
+                            android.R.drawable.stat_sys_download_done);
+                    getNotifier().setAutoCancel(true);
+                    getNotifier().setTitle(getContext().getString(
+                            R.string.downloader_complete));
+                    getNotifier().setProgress(100);
+                    getNotifier().show();
+                }
+            }, 100);
+            eventBus.post(new DownloadEvent(subscriberIds, DownloadEvent.OK,
+                    localFiles));
         }
-    }
-
-    /**
-     * Get the file name from the remote file object.
-     *
-     * @param file Remote file
-     * @return File name
-     */
-    private String getRemoteFileName(final RemoteFile file) {
-        String[] splitPath = file.getRemotePath().split("/");
-        return splitPath[splitPath.length - 1];
     }
 
     /**
@@ -250,67 +254,5 @@ public class OcDownloader implements OnRemoteOperationListener,
             remotePath = remotePath + FileUtils.PATH_SEPARATOR;
         }
         return remotePath;
-    }
-
-    @Override
-    public final void onJsonFilesRead(final List<JsonFile> jsonFiles) {
-        callback.onJsonFilesRead(jsonFiles);
-    }
-
-    @Override
-    public final void onReadJsonFileFailed(final Exception exception) {
-        callback.onReadingFileFailed(exception);
-    }
-
-    /**
-     * Listener to get notification from the OcDownloader tasks.
-     */
-    public interface OcDownloaderListener {
-
-        /**
-         * Called when a download operation starts.
-         *
-         * @param file Remote file being downloaded
-         */
-        void onDownloadStart(RemoteFile file);
-
-        /**
-         * Called when there is no file to download.
-         */
-        void onNoFileToDownload();
-
-        /**
-         * Called when the file is being downloaded.
-         *
-         * @param percentage Progress of the download (percentage)
-         */
-        void onDownloading(int percentage);
-
-        /**
-         * Called when all download operations are completed.
-         */
-        void onAllDownloadComplete();
-
-        /**
-         * Called when the download failed.
-         *
-         * @param message Message describing the cause of the failure
-         */
-        void onDownloadFailed(String message);
-
-        /**
-         * Called when all the files have been read and the JSON objects
-         * created.
-         *
-         * @param jsonFiles List of JSON files read
-         */
-        void onJsonFilesRead(List<JsonFile> jsonFiles);
-
-        /**
-         * Called when the JSON file could not have been read.
-         *
-         * @param e Exception thrown during the task
-         */
-        void onReadingFileFailed(Exception e);
     }
 }

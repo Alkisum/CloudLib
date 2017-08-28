@@ -3,6 +3,9 @@ package com.alkisum.android.cloudops.file.json;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.alkisum.android.cloudops.events.JsonFileWriterEvent;
+
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 
 import java.io.File;
@@ -14,7 +17,7 @@ import java.util.Queue;
  * Task writing JSON objects into files.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
@@ -23,11 +26,6 @@ public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
      * Context.
      */
     private final Context context;
-
-    /**
-     * Listener to get notification when the task finishes.
-     */
-    private final JsonFileWriterListener callback;
 
     /**
      * List of JSON objects to write to files.
@@ -40,18 +38,23 @@ public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
     private Exception exception;
 
     /**
+     * Subscriber ids allowed to process the events.
+     */
+    private Integer[] subscriberIds;
+
+    /**
      * JsonFileWriter constructor.
      *
-     * @param context   Context
-     * @param callback  Listener of the task
-     * @param jsonFiles List of JSON files
+     * @param context       Context
+     * @param jsonFiles     List of JSON files
+     * @param subscriberIds Subscriber ids allowed to process the events
      */
     public JsonFileWriter(final Context context,
-                          final JsonFileWriterListener callback,
-                          final Queue<JsonFile> jsonFiles) {
+                          final Queue<JsonFile> jsonFiles,
+                          final Integer[] subscriberIds) {
         this.context = context;
-        this.callback = callback;
         this.jsonFiles = jsonFiles;
+        this.subscriberIds = subscriberIds;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
         try {
             for (JsonFile jsonFile : jsonFiles) {
                 // Create temporary file, its name does not matter
-                File file = File.createTempFile("_" + jsonFile.getBaseName(),
+                File file = File.createTempFile(jsonFile.getBaseName(),
                         JsonFile.FILE_EXT, context.getCacheDir());
 
                 FileWriter writer = new FileWriter(file);
@@ -80,27 +83,11 @@ public class JsonFileWriter extends AsyncTask<Void, Void, Void> {
     @Override
     protected final void onPostExecute(final Void param) {
         if (exception == null) {
-            callback.onJsonFilesWritten();
+            EventBus.getDefault().post(new JsonFileWriterEvent(subscriberIds,
+                    JsonFileWriterEvent.OK, jsonFiles));
         } else {
-            callback.onWriteJsonFileFailed(exception);
+            EventBus.getDefault().post(new JsonFileWriterEvent(subscriberIds,
+                    JsonFileWriterEvent.ERROR, exception));
         }
-    }
-
-    /**
-     * Listener for the JsonFileWriter.
-     */
-    public interface JsonFileWriterListener {
-
-        /**
-         * Called when the JSON objects have been written into the files.
-         */
-        void onJsonFilesWritten();
-
-        /**
-         * Called when an exception has been caught during the task.
-         *
-         * @param exception Exception caught
-         */
-        void onWriteJsonFileFailed(Exception exception);
     }
 }

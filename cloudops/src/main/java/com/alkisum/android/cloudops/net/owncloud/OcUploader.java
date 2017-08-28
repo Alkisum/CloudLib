@@ -1,21 +1,22 @@
 package com.alkisum.android.cloudops.net.owncloud;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
+import com.alkisum.android.cloudops.R;
+import com.alkisum.android.cloudops.events.UploadEvent;
 import com.alkisum.android.cloudops.file.json.JsonFile;
-import com.alkisum.android.cloudops.file.json.JsonFileWriter;
-import com.owncloud.android.lib.common.OwnCloudClient;
-import com.owncloud.android.lib.common.OwnCloudClientFactory;
-import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
+import com.alkisum.android.cloudops.utils.OcUtils;
 import com.owncloud.android.lib.common.network.OnDatatransferProgressListener;
 import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.FileUtils;
 import com.owncloud.android.lib.resources.files.UploadRemoteFileOperation;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.Queue;
@@ -24,11 +25,11 @@ import java.util.Queue;
  * Class uploading files to the ownCloud server.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
-public class OcUploader implements OnRemoteOperationListener,
-        OnDatatransferProgressListener, JsonFileWriter.JsonFileWriterListener {
+public class OcUploader extends OcOperator implements OnRemoteOperationListener,
+        OnDatatransferProgressListener {
 
     /**
      * Log tag.
@@ -36,19 +37,14 @@ public class OcUploader implements OnRemoteOperationListener,
     private static final String TAG = "OcUploader";
 
     /**
+     * Subscribers allowed to process the events.
+     */
+    private Integer[] subscriberIds;
+
+    /**
      * Queue of JSON files to upload.
      */
-    private final Queue<JsonFile> jsonFiles;
-
-    /**
-     * Context.
-     */
-    private final Context context;
-
-    /**
-     * Listener for the upload task.
-     */
-    private final OcUploaderListener callback;
+    private Queue<JsonFile> jsonFiles;
 
     /**
      * Path on the server where to upload the file.
@@ -56,28 +52,22 @@ public class OcUploader implements OnRemoteOperationListener,
     private String remotePath;
 
     /**
-     * OwnCloud client.
+     * EventBus instance.
      */
-    private OwnCloudClient client;
-
-    /**
-     * Handler for the operation on the ownCloud server.
-     */
-    private final Handler handler;
+    private EventBus eventBus = EventBus.getDefault();
 
     /**
      * OcUploader constructor.
      *
-     * @param context   Context
-     * @param callback  OcUploaderListener instance
-     * @param jsonFiles Queue of json files to upload
+     * @param context       Context
+     * @param intent        Intent for notification, null if no intent needed
+     * @param subscriberIds Subscribers allowed to process the events
      */
-    public OcUploader(final Context context, final OcUploaderListener callback,
-                      final Queue<JsonFile> jsonFiles) {
-        this.context = context;
-        this.callback = callback;
-        this.jsonFiles = jsonFiles;
-        this.handler = new Handler();
+    public OcUploader(final Context context, final Intent intent,
+                      final Integer[] subscriberIds) {
+        super(context, intent, "ocUploaderNotification",
+                android.R.drawable.stat_sys_upload);
+        this.subscriberIds = subscriberIds;
     }
 
     /**
@@ -87,37 +77,21 @@ public class OcUploader implements OnRemoteOperationListener,
      * @param path     Remote path
      * @param username Username
      * @param password Password
-     * @return Current instance of the uploader
      */
-    public final OcUploader init(final String address, final String path,
-                                 final String username, final String password) {
+    public final void init(final String address, final String path,
+                           final String username, final String password) {
         remotePath = path;
-
-        Uri serverUri = Uri.parse(address);
-        client = OwnCloudClientFactory.createOwnCloudClient(
-                serverUri, context, true);
-        client.setCredentials(OwnCloudCredentialsFactory.newBasicCredentials(
-                username, password));
-
-        return this;
+        super.init(address, username, password);
     }
 
     /**
-     * Start the process. Execute the JsonFileWriter task to write JSON objects
-     * into temporary JSON files.
+     * Start uploading the given JSON files.
+     *
+     * @param jsonFileQueue JSON files to upload
      */
-    public final void start() {
-        new JsonFileWriter(context, this, jsonFiles).execute();
-    }
-
-    @Override
-    public final void onJsonFilesWritten() {
+    public final void start(final Queue<JsonFile> jsonFileQueue) {
+        this.jsonFiles = jsonFileQueue;
         upload(jsonFiles.poll());
-    }
-
-    @Override
-    public final void onWriteJsonFileFailed(final Exception exception) {
-        callback.onWritingFileFailed(exception);
     }
 
     /**
@@ -126,8 +100,6 @@ public class OcUploader implements OnRemoteOperationListener,
      * @param jsonFile JSON file to upload
      */
     private void upload(final JsonFile jsonFile) {
-        callback.onUploadStart(jsonFile);
-
         File fileToUpload = jsonFile.getFile();
         String path = buildRemotePath(jsonFile);
         String mimeType = "text/plain";
@@ -140,7 +112,7 @@ public class OcUploader implements OnRemoteOperationListener,
                 mimeType,
                 timeStamp);
         op.addDatatransferProgressListener(this);
-        op.execute(client, this, handler);
+        op.execute(getClient(), this, getHandler());
     }
 
     /**
@@ -174,13 +146,10 @@ public class OcUploader implements OnRemoteOperationListener,
         } else {
             percentage = 0;
         }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "Uploading... (" + percentage + "%)");
-                callback.onUploading(percentage);
-            }
-        });
+        getNotifier().setTitle(getContext().getString(
+                R.string.uploader_uploading) + OcUtils.getFileName(fileName));
+        getNotifier().setProgress(percentage);
+        getNotifier().show();
     }
 
     @Override
@@ -188,54 +157,37 @@ public class OcUploader implements OnRemoteOperationListener,
             final RemoteOperation operation,
             final RemoteOperationResult result) {
         if (result.isSuccess()) {
-            JsonFile jsonFile = jsonFiles.poll();
-            if (jsonFile != null) {
-                upload(jsonFile);
-            } else {
-                callback.onAllUploadComplete();
-            }
+            onUploadRemoteFileFinish();
         } else {
             Log.e(TAG, result.getLogMessage(), result.getException());
-            callback.onUploadFailed(result.getLogMessage());
+            eventBus.post(new UploadEvent(subscriberIds, UploadEvent.ERROR,
+                    result.getLogMessage()));
         }
     }
 
     /**
-     * Listener to get notification from the OcUploader tasks.
+     * Called when the upload remote file operation is finished.
      */
-    public interface OcUploaderListener {
-
-        /**
-         * Called when the JSON file could not have been written.
-         *
-         * @param e Exception thrown during the task
-         */
-        void onWritingFileFailed(Exception e);
-
-        /**
-         * Called when an upload operation starts.
-         *
-         * @param jsonFile JSON file that is being uploaded
-         */
-        void onUploadStart(JsonFile jsonFile);
-
-        /**
-         * Called when the file is being uploaded.
-         *
-         * @param percentage Progress of the upload (percentage)
-         */
-        void onUploading(int percentage);
-
-        /**
-         * Called when all upload operations are completed.
-         */
-        void onAllUploadComplete();
-
-        /**
-         * Called when the upload failed.
-         *
-         * @param message Message describing the cause of the failure
-         */
-        void onUploadFailed(String message);
+    private void onUploadRemoteFileFinish() {
+        JsonFile jsonFile = jsonFiles.poll();
+        if (jsonFile != null) {
+            upload(jsonFile);
+            eventBus.post(new UploadEvent(subscriberIds,
+                    UploadEvent.UPLOADING));
+        } else {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getNotifier().setIcon(
+                            android.R.drawable.stat_sys_upload_done);
+                    getNotifier().setAutoCancel(true);
+                    getNotifier().setTitle(getContext().getString(
+                            R.string.uploader_complete));
+                    getNotifier().setProgress(100);
+                    getNotifier().show();
+                }
+            }, 100);
+            eventBus.post(new UploadEvent(subscriberIds, UploadEvent.OK));
+        }
     }
 }

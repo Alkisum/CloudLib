@@ -19,7 +19,7 @@ import com.alkisum.android.cloudops.utils.CloudPref;
  * Dialog to connect to a ownCloud server.
  *
  * @author Alkisum
- * @version 1.1
+ * @version 1.2
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -103,10 +103,10 @@ public class ConnectDialog extends DialogFragment {
 
         View view = View.inflate(getActivity(), R.layout.dialog_connect, null);
 
-        addressEditText = (EditText) view.findViewById(R.id.address);
-        pathEditText = (EditText) view.findViewById(R.id.path);
-        usernameEditText = (EditText) view.findViewById(R.id.username);
-        passwordEditText = (EditText) view.findViewById(R.id.password);
+        addressEditText = view.findViewById(R.id.address);
+        pathEditText = view.findViewById(R.id.path);
+        usernameEditText = view.findViewById(R.id.username);
+        passwordEditText = view.findViewById(R.id.password);
 
         addressEditText.setText(sharedPref.getString(CloudPref.ADDRESS, ""));
         pathEditText.setText(sharedPref.getString(CloudPref.PATH, ""));

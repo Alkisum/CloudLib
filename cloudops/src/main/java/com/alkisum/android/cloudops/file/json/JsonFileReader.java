@@ -2,6 +2,9 @@ package com.alkisum.android.cloudops.file.json;
 
 import android.os.AsyncTask;
 
+import com.alkisum.android.cloudops.events.JsonFileReaderEvent;
+
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,15 +19,10 @@ import java.util.List;
  * Task reading data from files and converting it to JSON objects.
  *
  * @author Alkisum
- * @version 1.0
+ * @version 1.2
  * @since 1.0
  */
 public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
-
-    /**
-     * Listener to get notification when the task finishes.
-     */
-    private final JsonFileReaderListener callback;
 
     /**
      * List of files to read.
@@ -37,15 +35,20 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
     private Exception exception;
 
     /**
+     * Subscriber ids allowed to process the events.
+     */
+    private Integer[] subscriberIds;
+
+    /**
      * JsonFileReader constructor.
      *
-     * @param callback Listener of the task
-     * @param files    List of files to read
+     * @param files         List of files to read
+     * @param subscriberIds Subscriber ids allowed to process the events
      */
-    public JsonFileReader(final JsonFileReaderListener callback,
-                          final List<File> files) {
-        this.callback = callback;
+    public JsonFileReader(final List<File> files,
+                          final Integer[] subscriberIds) {
         this.files = files;
+        this.subscriberIds = subscriberIds;
     }
 
     @Override
@@ -85,30 +88,11 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
     @Override
     protected final void onPostExecute(final List<JsonFile> jsonFiles) {
         if (exception == null) {
-            callback.onJsonFilesRead(jsonFiles);
+            EventBus.getDefault().post(new JsonFileReaderEvent(subscriberIds,
+                    JsonFileReaderEvent.OK, jsonFiles));
         } else {
-            callback.onReadJsonFileFailed(exception);
+            EventBus.getDefault().post(new JsonFileReaderEvent(subscriberIds,
+                    JsonFileReaderEvent.ERROR, exception));
         }
-    }
-
-    /**
-     * Listener for the JsonFileReader.
-     */
-    public interface JsonFileReaderListener {
-
-        /**
-         * Called when the files are read and the data converted to JSON
-         * objects.
-         *
-         * @param jsonFiles List of JSON files
-         */
-        void onJsonFilesRead(List<JsonFile> jsonFiles);
-
-        /**
-         * Called when an exception has been caught during the task.
-         *
-         * @param exception Exception caught
-         */
-        void onReadJsonFileFailed(Exception exception);
     }
 }

@@ -130,7 +130,7 @@ public class ConnectDialog extends DialogFragment {
                                 }
 
                                 if (sharedPref.getBoolean(
-                                        CloudPref.SAVE_OWNCLOUD_INFO, false)) {
+                                        CloudPref.SAVE_CLOUD_INFO, false)) {
                                     saveConnectInfo(info);
                                 }
 

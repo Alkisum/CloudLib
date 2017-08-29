@@ -10,24 +10,24 @@ package com.alkisum.android.cloudops.utils;
 public final class CloudPref {
 
     /**
-     * Preference key for ownCloud server address.
+     * Preference key for cloud server address.
      */
     public static final String ADDRESS = "address";
 
     /**
-     * Preference key for ownCloud remote path.
+     * Preference key for cloud remote path.
      */
     public static final String PATH = "path";
 
     /**
-     * Preference key for ownCloud username.
+     * Preference key for cloud username.
      */
     public static final String USERNAME = "username";
 
     /**
-     * Preference key for save ownCloud connection information settings.
+     * Preference key for save cloud connection information settings.
      */
-    public static final String SAVE_OWNCLOUD_INFO = "saveOwnCloudInfo";
+    public static final String SAVE_CLOUD_INFO = "saveCloudInfo";
 
     /**
      * CloudPref constructor.

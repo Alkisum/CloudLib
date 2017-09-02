@@ -1,6 +1,6 @@
-# CloudOps
+# CloudLib
 
-CloudOps is a library for Android that simplifies file operations for file hosting services.
+CloudLib is a library for Android that simplifies file operations for file hosting services.
 
 
 ## Requirements

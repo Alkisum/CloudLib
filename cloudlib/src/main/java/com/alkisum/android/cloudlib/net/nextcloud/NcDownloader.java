@@ -1,4 +1,4 @@
-package com.alkisum.android.cloudlib.net.owncloud;
+package com.alkisum.android.cloudlib.net.nextcloud;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,19 +27,19 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * Class downloading files from an ownCloud server.
+ * Class downloading files from an Nextcloud server.
  *
  * @author Alkisum
  * @version 1.2
  * @since 1.0
  */
-public class OcDownloader extends OcOperator implements
+public class NcDownloader extends NcOperator implements
         OnRemoteOperationListener, OnDatatransferProgressListener {
 
     /**
      * Log tag.
      */
-    private static final String TAG = "OcDownloader";
+    private static final String TAG = "NcDownloader";
 
     /**
      * Subscriber ids allowed to process the events.
@@ -77,15 +77,15 @@ public class OcDownloader extends OcOperator implements
     private EventBus eventBus = EventBus.getDefault();
 
     /**
-     * OcDownloader constructor.
+     * NcDownloader constructor.
      *
      * @param context       Context
      * @param intent        Intent for notification, null if no intent needed
      * @param subscriberIds Subscriber ids allowed to process the events
      */
-    public OcDownloader(final Context context, final Intent intent,
+    public NcDownloader(final Context context, final Intent intent,
                         final Integer[] subscriberIds) {
-        super(context, intent, "ocDownloaderNotification",
+        super(context, intent, "NcDownloaderNotification",
                 android.R.drawable.stat_sys_download);
         this.subscriberIds = subscriberIds;
     }

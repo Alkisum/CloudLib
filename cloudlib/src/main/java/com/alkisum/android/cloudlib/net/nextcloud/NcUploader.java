@@ -1,4 +1,4 @@
-package com.alkisum.android.cloudlib.net.owncloud;
+package com.alkisum.android.cloudlib.net.nextcloud;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,13 +28,13 @@ import java.util.Queue;
  * @version 1.2
  * @since 1.0
  */
-public class OcUploader extends OcOperator implements OnRemoteOperationListener,
+public class NcUploader extends NcOperator implements OnRemoteOperationListener,
         OnDatatransferProgressListener {
 
     /**
      * Log tag.
      */
-    private static final String TAG = "OcUploader";
+    private static final String TAG = "NcUploader";
 
     /**
      * Subscribers allowed to process the events.
@@ -57,13 +57,13 @@ public class OcUploader extends OcOperator implements OnRemoteOperationListener,
     private EventBus eventBus = EventBus.getDefault();
 
     /**
-     * OcUploader constructor.
+     * NcUploader constructor.
      *
      * @param context       Context
      * @param intent        Intent for notification, null if no intent needed
      * @param subscriberIds Subscribers allowed to process the events
      */
-    public OcUploader(final Context context, final Intent intent,
+    public NcUploader(final Context context, final Intent intent,
                       final Integer[] subscriberIds) {
         super(context, intent, "ocUploaderNotification",
                 android.R.drawable.stat_sys_upload);

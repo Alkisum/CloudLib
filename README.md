@@ -16,14 +16,14 @@ CloudLib is a library for Android that simplifies file operations for file hosti
 
 ## Used by
 
-+ [ownRun](https://github.com/Alkisum/ownRun)
++ [CloudRun](https://github.com/Alkisum/CloudRun)
 + [Notepad](https://github.com/Alkisum/Notepad)
 
 
 ## Used libraries
 
 + [EventBus](https://github.com/greenrobot/EventBus)
-+ [ownCloud Android Library](https://github.com/owncloud/android-library)
++ [Nextcloud Android Library](https://github.com/nextcloud/android-library)
 
 
 ## License

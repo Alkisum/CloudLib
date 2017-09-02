@@ -1,4 +1,4 @@
-package com.alkisum.android.cloudlib.net.owncloud;
+package com.alkisum.android.cloudlib.net.nextcloud;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +17,7 @@ import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
  * @version 1.2
  * @since 1.2
  */
-class OcOperator {
+class NcOperator {
 
     /**
      * Context.
@@ -40,14 +40,14 @@ class OcOperator {
     private Notifier notifier;
 
     /**
-     * OcOperator constructor.
+     * NcOperator constructor.
      *
      * @param context   Context
      * @param intent    Intent for notification
      * @param channelId Channel id for notification
      * @param icon      Icon for notification
      */
-    OcOperator(final Context context, final Intent intent,
+    NcOperator(final Context context, final Intent intent,
                final String channelId, final int icon) {
         this.context = context;
         this.handler = new Handler();

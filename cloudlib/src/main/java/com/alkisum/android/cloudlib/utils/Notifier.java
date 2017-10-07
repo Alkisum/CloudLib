@@ -1,9 +1,11 @@
 package com.alkisum.android.cloudlib.utils;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Random;
@@ -12,7 +14,7 @@ import java.util.Random;
  * Class used by cloud operators to send notifications.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
 public class Notifier {
@@ -35,12 +37,19 @@ public class Notifier {
     /**
      * Notifier constructor.
      *
-     * @param context   Context
-     * @param channelId Channel id
+     * @param context     Context
+     * @param channelId   Channel id
+     * @param channelName Channel name
      */
-    public Notifier(final Context context, final String channelId) {
+    public Notifier(final Context context, final String channelId,
+                    final String channelName) {
         notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    channelId, channelName, NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
         builder = new NotificationCompat.Builder(context, channelId);
         id = new Random().nextInt(100);
     }

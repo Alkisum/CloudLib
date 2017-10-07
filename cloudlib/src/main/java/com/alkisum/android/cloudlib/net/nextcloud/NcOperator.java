@@ -14,7 +14,7 @@ import com.owncloud.android.lib.common.OwnCloudCredentialsFactory;
  * Base class for ownCloud operations.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
 class NcOperator {
@@ -42,17 +42,19 @@ class NcOperator {
     /**
      * NcOperator constructor.
      *
-     * @param context   Context
-     * @param intent    Intent for notification
-     * @param channelId Channel id for notification
-     * @param icon      Icon for notification
+     * @param context     Context
+     * @param intent      Intent for notification
+     * @param channelId   Channel id for notification
+     * @param channelName Channel name
+     * @param icon        Icon for notification
      */
     NcOperator(final Context context, final Intent intent,
-               final String channelId, final int icon) {
+               final String channelId, final String channelName,
+               final int icon) {
         this.context = context;
         this.handler = new Handler();
 
-        notifier = new Notifier(context, channelId);
+        notifier = new Notifier(context, channelId, channelName);
         if (intent != null) {
             notifier.setIntent(context, intent);
         }

@@ -25,7 +25,7 @@ import java.util.Queue;
  * Class uploading files to the ownCloud server.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.0
  */
 public class NcUploader extends NcOperator implements OnRemoteOperationListener,
@@ -61,11 +61,14 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
      *
      * @param context       Context
      * @param intent        Intent for notification, null if no intent needed
+     * @param channelId     Channel id
+     * @param channelName   Channel name
      * @param subscriberIds Subscribers allowed to process the events
      */
     public NcUploader(final Context context, final Intent intent,
+                      final String channelId, final String channelName,
                       final Integer[] subscriberIds) {
-        super(context, intent, "ocUploaderNotification",
+        super(context, intent, channelId, channelName,
                 android.R.drawable.stat_sys_upload);
         this.subscriberIds = subscriberIds;
     }

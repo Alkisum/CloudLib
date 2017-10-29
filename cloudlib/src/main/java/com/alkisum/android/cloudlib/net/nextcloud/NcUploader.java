@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.alkisum.android.cloudlib.R;
 import com.alkisum.android.cloudlib.events.UploadEvent;
-import com.alkisum.android.cloudlib.file.json.JsonFile;
+import com.alkisum.android.cloudlib.file.CloudFile;
 import com.alkisum.android.cloudlib.utils.OcUtils;
 import com.owncloud.android.lib.common.network.OnDatatransferProgressListener;
 import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.Queue;
 
 /**
- * Class uploading files to the ownCloud server.
+ * Class uploading files to the server.
  *
  * @author Alkisum
  * @version 1.3
@@ -42,9 +42,9 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
     private Integer[] subscriberIds;
 
     /**
-     * Queue of JSON files to upload.
+     * Queue of files to upload.
      */
-    private Queue<JsonFile> jsonFiles;
+    private Queue<CloudFile> cloudFiles;
 
     /**
      * Path on the server where to upload the file.
@@ -88,23 +88,23 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
     }
 
     /**
-     * Start uploading the given JSON files.
+     * Start uploading the given files.
      *
-     * @param jsonFileQueue JSON files to upload
+     * @param cloudFileQueue Files to upload
      */
-    public final void start(final Queue<JsonFile> jsonFileQueue) {
-        this.jsonFiles = jsonFileQueue;
-        upload(jsonFiles.poll());
+    public final void start(final Queue<CloudFile> cloudFileQueue) {
+        this.cloudFiles = cloudFileQueue;
+        upload(cloudFiles.poll());
     }
 
     /**
-     * Upload the file to the ownCloud server.
+     * Upload the file to the server.
      *
-     * @param jsonFile JSON file to upload
+     * @param file File to upload
      */
-    private void upload(final JsonFile jsonFile) {
-        File fileToUpload = jsonFile.getFile();
-        String path = buildRemotePath(jsonFile);
+    private void upload(final CloudFile file) {
+        File fileToUpload = file.getFile();
+        String path = buildRemotePath(file);
         String mimeType = "text/plain";
         Long timeStampLong = fileToUpload.lastModified() / 1000;
         String timeStamp = timeStampLong.toString();
@@ -121,10 +121,10 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
     /**
      * Build a valid remote path from the path given by the user.
      *
-     * @param jsonFile JSON file used to build the remote path
+     * @param file File used to build the remote path
      * @return Valid remote path
      */
-    private String buildRemotePath(final JsonFile jsonFile) {
+    private String buildRemotePath(final CloudFile file) {
         if (remotePath == null || remotePath.equals("")) {
             remotePath = FileUtils.PATH_SEPARATOR;
         }
@@ -135,7 +135,7 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
             remotePath = remotePath + FileUtils.PATH_SEPARATOR;
         }
         // Add the file name to the remote path
-        return remotePath + jsonFile.getName();
+        return remotePath + file.getName();
     }
 
     @Override
@@ -172,9 +172,9 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
      * Called when the upload remote file operation is finished.
      */
     private void onUploadRemoteFileFinish() {
-        JsonFile jsonFile = jsonFiles.poll();
-        if (jsonFile != null) {
-            upload(jsonFile);
+        CloudFile file = cloudFiles.poll();
+        if (file != null) {
+            upload(file);
             eventBus.post(new UploadEvent(subscriberIds,
                     UploadEvent.UPLOADING));
         } else {

@@ -4,7 +4,7 @@
     <string name="action_connect">Connect</string>
 
     <!-- ConnectDialog -->
-    <string name="connect_title">Connect to ownCloud</string>
+    <string name="connect_title">Connect to remote server</string>
     <string name="connect_hint_address">Server address</string>
     <string name="connect_hint_path">Remote path</string>
     <string name="connect_hint_username">Username</string>

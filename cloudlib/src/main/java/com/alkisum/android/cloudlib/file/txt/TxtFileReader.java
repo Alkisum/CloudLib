@@ -1,13 +1,11 @@
-package com.alkisum.android.cloudlib.file.json;
+package com.alkisum.android.cloudlib.file.txt;
 
 import android.os.AsyncTask;
 
-import com.alkisum.android.cloudlib.events.JsonFileReaderEvent;
+import com.alkisum.android.cloudlib.events.TxtFileReaderEvent;
 import com.alkisum.android.cloudlib.file.CloudFile;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,13 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Task reading data from files and converting it to JSON file objects.
+ * Task reading data from files and converting it to TXT file objects.
  *
  * @author Alkisum
  * @version 1.3
- * @since 1.0
+ * @since 1.3
  */
-public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
+
+public class TxtFileReader extends AsyncTask<Void, Void, List<TxtFile>> {
 
     /**
      * List of files to read.
@@ -40,20 +39,20 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
     private Integer[] subscriberIds;
 
     /**
-     * JsonFileReader constructor.
+     * TxtFileReader constructor.
      *
      * @param files         List of files to read
      * @param subscriberIds Subscriber ids allowed to process the events
      */
-    public JsonFileReader(final List<CloudFile> files,
+    public TxtFileReader(final List<CloudFile> files,
                           final Integer[] subscriberIds) {
         this.files = files;
         this.subscriberIds = subscriberIds;
     }
 
     @Override
-    protected final List<JsonFile> doInBackground(final Void... params) {
-        List<JsonFile> jsonFiles = new ArrayList<>();
+    protected final List<TxtFile> doInBackground(final Void... params) {
+        List<TxtFile> txtFiles = new ArrayList<>();
         BufferedReader br = null;
         try {
             for (CloudFile file : files) {
@@ -64,12 +63,13 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
                     sb.append(line);
                     line = br.readLine();
                 }
-                String jsonString = sb.toString();
-                JsonFile jsonFile = (JsonFile) file;
-                jsonFile.setJsonObject(new JSONObject(jsonString));
-                jsonFiles.add(jsonFile);
+                String content = sb.toString();
+                TxtFile txtFile = new TxtFile(
+                        file.getName(), content, file.getFile(),
+                        file.getCreationTime(), file.getModifiedTime());
+                txtFiles.add(txtFile);
             }
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             exception = e;
         } finally {
             try {
@@ -80,17 +80,17 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
                 exception = e;
             }
         }
-        return jsonFiles;
+        return txtFiles;
     }
 
     @Override
-    protected final void onPostExecute(final List<JsonFile> jsonFiles) {
+    protected final void onPostExecute(final List<TxtFile> txtFiles) {
         if (exception == null) {
-            EventBus.getDefault().post(new JsonFileReaderEvent(subscriberIds,
-                    JsonFileReaderEvent.OK, jsonFiles));
+            EventBus.getDefault().post(new TxtFileReaderEvent(subscriberIds,
+                    TxtFileReaderEvent.OK, txtFiles));
         } else {
-            EventBus.getDefault().post(new JsonFileReaderEvent(subscriberIds,
-                    JsonFileReaderEvent.ERROR, exception));
+            EventBus.getDefault().post(new TxtFileReaderEvent(subscriberIds,
+                    TxtFileReaderEvent.ERROR, exception));
         }
     }
 }

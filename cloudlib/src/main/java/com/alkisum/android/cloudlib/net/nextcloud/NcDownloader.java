@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.alkisum.android.cloudlib.R;
 import com.alkisum.android.cloudlib.events.DownloadEvent;
-import com.alkisum.android.cloudlib.file.json.JsonFile;
+import com.alkisum.android.cloudlib.file.CloudFile;
 import com.alkisum.android.cloudlib.utils.OcUtils;
 import com.owncloud.android.lib.common.network.OnDatatransferProgressListener;
 import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
@@ -59,7 +59,7 @@ public class NcDownloader extends NcOperator implements
     /**
      * List of downloaded files to be read.
      */
-    private List<File> localFiles;
+    private List<CloudFile> cloudFiles;
 
     /**
      * List of file names to exclude when downloading remote files.
@@ -77,20 +77,28 @@ public class NcDownloader extends NcOperator implements
     private EventBus eventBus = EventBus.getDefault();
 
     /**
+     * Extensions of files to download.
+     */
+    private final String[] fileExtensions;
+
+    /**
      * NcDownloader constructor.
      *
-     * @param context       Context
-     * @param intent        Intent for notification, null if no intent needed
-     * @param channelId     Channel id
-     * @param channelName   Channel name
-     * @param subscriberIds Subscriber ids allowed to process the events
+     * @param context        Context
+     * @param intent         Intent for notification, null if no intent needed
+     * @param channelId      Channel id
+     * @param channelName    Channel name
+     * @param subscriberIds  Subscriber ids allowed to process the events
+     * @param fileExtensions Extensions of files to download
      */
     public NcDownloader(final Context context, final Intent intent,
                         final String channelId, final String channelName,
-                        final Integer[] subscriberIds) {
+                        final Integer[] subscriberIds,
+                        final String[] fileExtensions) {
         super(context, intent, channelId, channelName,
                 android.R.drawable.stat_sys_download);
         this.subscriberIds = subscriberIds;
+        this.fileExtensions = fileExtensions;
     }
 
     /**
@@ -137,9 +145,12 @@ public class NcDownloader extends NcOperator implements
      * @param file Remote file
      */
     private void download(final RemoteFile file) {
-        File localFile = new File(getContext().getCacheDir(),
-                file.getRemotePath());
-        localFiles.add(localFile);
+        CloudFile cloudFile = new CloudFile(
+                OcUtils.getRemoteFileName(file),
+                new File(getContext().getCacheDir(), file.getRemotePath()),
+                file.getCreationTimestamp(),
+                file.getModifiedTimestamp());
+        cloudFiles.add(cloudFile);
 
         DownloadRemoteFileOperation downloadOperation =
                 new DownloadRemoteFileOperation(file.getRemotePath(),
@@ -189,13 +200,16 @@ public class NcDownloader extends NcOperator implements
      */
     private void onReadRemoteFolderFinish(final RemoteOperationResult result) {
         remoteFiles = new LinkedList<>();
-        localFiles = new ArrayList<>();
+        cloudFiles = new ArrayList<>();
         for (Object obj : result.getData()) {
             RemoteFile remoteFile = (RemoteFile) obj;
             String fileName = OcUtils.getRemoteFileName(remoteFile);
-            if (fileName.endsWith(JsonFile.FILE_EXT)
-                    && !excludeFileNames.contains(fileName)) {
-                remoteFiles.add(remoteFile);
+            for (String fileExt : fileExtensions) {
+                if (fileName.endsWith(fileExt)
+                        && (excludeFileNames == null
+                        || !excludeFileNames.contains(fileName))) {
+                    remoteFiles.add(remoteFile);
+                }
             }
         }
         totalRemoteFiles = remoteFiles.size();
@@ -235,7 +249,7 @@ public class NcDownloader extends NcOperator implements
                 }
             }, 100);
             eventBus.post(new DownloadEvent(subscriberIds, DownloadEvent.OK,
-                    localFiles));
+                    cloudFiles));
         }
     }
 

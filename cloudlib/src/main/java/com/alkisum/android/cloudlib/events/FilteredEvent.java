@@ -6,10 +6,10 @@ import java.util.Arrays;
  * Base class for events using subscriber ids to allow event to be processed.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
-public class FilteredEvent {
+class FilteredEvent {
 
     /**
      * Subscriber ids allowed to process the event.
@@ -21,7 +21,7 @@ public class FilteredEvent {
      *
      * @param subscriberIds Subscriber ids allowed to process the event
      */
-    public FilteredEvent(final Integer[] subscriberIds) {
+    FilteredEvent(final Integer[] subscriberIds) {
         this.subscriberIds = subscriberIds;
     }
 

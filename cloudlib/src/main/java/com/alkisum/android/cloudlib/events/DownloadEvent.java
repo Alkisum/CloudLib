@@ -1,13 +1,14 @@
 package com.alkisum.android.cloudlib.events;
 
-import java.io.File;
+import com.alkisum.android.cloudlib.file.CloudFile;
+
 import java.util.List;
 
 /**
  * Class defining download event for EventBus.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
 public class DownloadEvent extends FilteredEvent {
@@ -45,7 +46,7 @@ public class DownloadEvent extends FilteredEvent {
     /**
      * Files downloaded.
      */
-    private List<File> files;
+    private List<CloudFile> files;
 
     /**
      * DownloadEvent constructor.
@@ -80,7 +81,7 @@ public class DownloadEvent extends FilteredEvent {
      * @param subscriberIds Subscriber ids allowed to process the event
      */
     public DownloadEvent(final Integer[] subscriberIds, final int result,
-                         final List<File> files) {
+                         final List<CloudFile> files) {
         super(subscriberIds);
         this.result = result;
         this.files = files;
@@ -103,7 +104,7 @@ public class DownloadEvent extends FilteredEvent {
     /**
      * @return Files downloaded
      */
-    public final List<File> getFiles() {
+    public final List<CloudFile> getFiles() {
         return files;
     }
 }

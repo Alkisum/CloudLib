@@ -17,7 +17,7 @@ CloudLib is a library for Android that simplifies file operations for file hosti
 ## Used by
 
 + [CloudRun](https://github.com/Alkisum/CloudRun)
-+ [Notepad](https://github.com/Alkisum/Notepad)
++ [CloudNotes](https://github.com/Alkisum/CloudNotes)
 
 
 ## Used libraries

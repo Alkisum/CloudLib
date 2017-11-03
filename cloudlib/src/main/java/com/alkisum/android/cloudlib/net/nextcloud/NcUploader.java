@@ -39,7 +39,7 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
     /**
      * Subscribers allowed to process the events.
      */
-    private Integer[] subscriberIds;
+    private final Integer[] subscriberIds;
 
     /**
      * Queue of files to upload.
@@ -54,7 +54,7 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
     /**
      * EventBus instance.
      */
-    private EventBus eventBus = EventBus.getDefault();
+    private final EventBus eventBus = EventBus.getDefault();
 
     /**
      * NcUploader constructor.

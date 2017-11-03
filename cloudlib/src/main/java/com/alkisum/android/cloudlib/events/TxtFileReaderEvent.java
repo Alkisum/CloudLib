@@ -26,7 +26,7 @@ public class TxtFileReaderEvent extends FilteredEvent {
     /**
      * TXT file reader result.
      */
-    private int result;
+    private final int result;
 
     /**
      * TXT files read.

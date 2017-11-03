@@ -26,7 +26,7 @@ public class JsonFileWriterEvent extends FilteredEvent {
     /**
      * JSON file writer result.
      */
-    private int result;
+    private final int result;
 
     /**
      * JSON files written.

@@ -36,7 +36,7 @@ public class DownloadEvent extends FilteredEvent {
     /**
      * Download operation result.
      */
-    private int result;
+    private final int result;
 
     /**
      * Error message.

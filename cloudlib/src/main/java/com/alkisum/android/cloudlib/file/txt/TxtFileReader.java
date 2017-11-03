@@ -20,7 +20,6 @@ import java.util.List;
  * @version 1.3
  * @since 1.3
  */
-
 public class TxtFileReader extends AsyncTask<Void, Void, List<TxtFile>> {
 
     /**
@@ -36,7 +35,7 @@ public class TxtFileReader extends AsyncTask<Void, Void, List<TxtFile>> {
     /**
      * Subscriber ids allowed to process the events.
      */
-    private Integer[] subscriberIds;
+    private final Integer[] subscriberIds;
 
     /**
      * TxtFileReader constructor.
@@ -45,7 +44,7 @@ public class TxtFileReader extends AsyncTask<Void, Void, List<TxtFile>> {
      * @param subscriberIds Subscriber ids allowed to process the events
      */
     public TxtFileReader(final List<CloudFile> files,
-                          final Integer[] subscriberIds) {
+                         final Integer[] subscriberIds) {
         this.files = files;
         this.subscriberIds = subscriberIds;
     }
@@ -62,11 +61,17 @@ public class TxtFileReader extends AsyncTask<Void, Void, List<TxtFile>> {
                 while (line != null) {
                     sb.append(line);
                     line = br.readLine();
+                    if (line != null) {
+                        sb.append(System.getProperty("line.separator"));
+                    }
                 }
                 String content = sb.toString();
                 TxtFile txtFile = new TxtFile(
-                        file.getName(), content, file.getFile(),
-                        file.getCreationTime(), file.getModifiedTime());
+                        file.getName(),
+                        content,
+                        file.getFile(),
+                        file.getCreationTime(),
+                        file.getModifiedTime());
                 txtFiles.add(txtFile);
             }
         } catch (IOException e) {

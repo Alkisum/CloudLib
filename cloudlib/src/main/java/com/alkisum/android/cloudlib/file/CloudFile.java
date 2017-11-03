@@ -41,7 +41,7 @@ public class CloudFile {
      *
      * @param name File name
      */
-    public CloudFile(final String name) {
+    protected CloudFile(final String name) {
         this.name = name;
         this.baseName = name.replaceFirst("[.][^.]+$", "");
     }

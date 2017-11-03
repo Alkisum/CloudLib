@@ -21,7 +21,7 @@ public class TxtFile extends CloudFile {
     /**
      * File content.
      */
-    private String content;
+    private final String content;
 
     /**
      * TxtFile constructor.
@@ -54,12 +54,5 @@ public class TxtFile extends CloudFile {
      */
     public String getContent() {
         return content;
-    }
-
-    /**
-     * @param content File content
-     */
-    public final void setContent(final String content) {
-        this.content = content;
     }
 }

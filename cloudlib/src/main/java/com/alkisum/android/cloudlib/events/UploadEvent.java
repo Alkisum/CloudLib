@@ -4,7 +4,7 @@ package com.alkisum.android.cloudlib.events;
  * Class defining upload event for EventBus.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
 public class UploadEvent extends FilteredEvent {
@@ -27,7 +27,7 @@ public class UploadEvent extends FilteredEvent {
     /**
      * Upload operation result.
      */
-    private int result;
+    private final int result;
 
     /**
      * Error message.

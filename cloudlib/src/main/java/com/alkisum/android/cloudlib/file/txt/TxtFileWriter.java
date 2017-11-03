@@ -46,7 +46,7 @@ public class TxtFileWriter extends AsyncTask<Void, Void, Void> {
     /**
      * Subscriber ids allowed to process the events.
      */
-    private Integer[] subscriberIds;
+    private final Integer[] subscriberIds;
 
     /**
      * TxtFileWriter constructor.

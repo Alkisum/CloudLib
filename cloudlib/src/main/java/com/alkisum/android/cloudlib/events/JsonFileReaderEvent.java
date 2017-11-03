@@ -8,7 +8,7 @@ import java.util.List;
  * Class defining JsonFileReader event for EventBus.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.3
  * @since 1.2
  */
 public class JsonFileReaderEvent extends FilteredEvent {
@@ -26,7 +26,7 @@ public class JsonFileReaderEvent extends FilteredEvent {
     /**
      * JSON file reader result.
      */
-    private int result;
+    private final int result;
 
     /**
      * JSON files read.

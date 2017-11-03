@@ -23,7 +23,7 @@ public class JsonFile extends CloudFile {
     /**
      * JSON object contained in the file.
      */
-    private JSONObject jsonObject;
+    private final JSONObject jsonObject;
 
     /**
      * JsonFile constructor.
@@ -56,12 +56,5 @@ public class JsonFile extends CloudFile {
      */
     public final JSONObject getJsonObject() {
         return jsonObject;
-    }
-
-    /**
-     * @param jsonObject JSON object contained in the file
-     */
-    public final void setJsonObject(final JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
     }
 }

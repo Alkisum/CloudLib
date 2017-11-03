@@ -26,7 +26,7 @@ public class TxtFileWriterEvent extends FilteredEvent {
     /**
      * TXT file writer result.
      */
-    private int result;
+    private final int result;
 
     /**
      * TXT files written.

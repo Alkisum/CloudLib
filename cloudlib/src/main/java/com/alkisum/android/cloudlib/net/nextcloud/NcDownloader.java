@@ -44,7 +44,7 @@ public class NcDownloader extends NcOperator implements
     /**
      * Subscriber ids allowed to process the events.
      */
-    private Integer[] subscriberIds;
+    private final Integer[] subscriberIds;
 
     /**
      * Remote path to use to download the files.
@@ -74,7 +74,7 @@ public class NcDownloader extends NcOperator implements
     /**
      * EventBus instance.
      */
-    private EventBus eventBus = EventBus.getDefault();
+    private final EventBus eventBus = EventBus.getDefault();
 
     /**
      * Extensions of files to download.

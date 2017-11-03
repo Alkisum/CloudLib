@@ -37,7 +37,7 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
     /**
      * Subscriber ids allowed to process the events.
      */
-    private Integer[] subscriberIds;
+    private final Integer[] subscriberIds;
 
     /**
      * JsonFileReader constructor.
@@ -65,8 +65,12 @@ public class JsonFileReader extends AsyncTask<Void, Void, List<JsonFile>> {
                     line = br.readLine();
                 }
                 String jsonString = sb.toString();
-                JsonFile jsonFile = (JsonFile) file;
-                jsonFile.setJsonObject(new JSONObject(jsonString));
+                JsonFile jsonFile = new JsonFile(
+                        file.getName(),
+                        new JSONObject(jsonString),
+                        file.getFile(),
+                        file.getCreationTime(),
+                        file.getModifiedTime());
                 jsonFiles.add(jsonFile);
             }
         } catch (IOException | JSONException e) {

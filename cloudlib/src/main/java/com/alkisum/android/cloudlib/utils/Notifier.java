@@ -22,17 +22,17 @@ public class Notifier {
     /**
      * Notification manager.
      */
-    private NotificationManager notificationManager;
+    private final NotificationManager notificationManager;
 
     /**
      * Notification builder.
      */
-    private NotificationCompat.Builder builder;
+    private final NotificationCompat.Builder builder;
 
     /**
      * Notification id.
      */
-    private int id;
+    private final int id;
 
     /**
      * Notifier constructor.
@@ -48,7 +48,10 @@ public class Notifier {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel(
                     channelId, channelName, NotificationManager.IMPORTANCE_LOW);
-            notificationManager.createNotificationChannel(notificationChannel);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(
+                        notificationChannel);
+            }
         }
         builder = new NotificationCompat.Builder(context, channelId);
         id = new Random().nextInt(100);

@@ -37,7 +37,7 @@ class NcOperator {
     /**
      * Notifier instance to show notification when doing operations.
      */
-    private Notifier notifier;
+    private final Notifier notifier;
 
     /**
      * NcOperator constructor.

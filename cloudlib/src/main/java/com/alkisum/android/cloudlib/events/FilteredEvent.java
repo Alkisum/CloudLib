@@ -9,19 +9,19 @@ import java.util.Arrays;
  * @version 1.3
  * @since 1.2
  */
-class FilteredEvent {
+public class FilteredEvent {
 
     /**
      * Subscriber ids allowed to process the event.
      */
-    private Integer[] subscriberIds;
+    private final Integer[] subscriberIds;
 
     /**
      * FilteredEvent constructor.
      *
      * @param subscriberIds Subscriber ids allowed to process the event
      */
-    FilteredEvent(final Integer[] subscriberIds) {
+    public FilteredEvent(final Integer[] subscriberIds) {
         this.subscriberIds = subscriberIds;
     }
 

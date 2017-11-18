@@ -7,7 +7,7 @@ android {
         minSdkVersion 18
         targetSdkVersion 26
         versionCode 5
-        versionName "1.4.dev"
+        versionName "1.4"
     }
     buildTypes {
         release {

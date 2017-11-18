@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 26
-        versionCode 4
-        versionName "1.3"
+        versionCode 5
+        versionName "1.4.dev"
     }
     buildTypes {
         release {
@@ -20,6 +20,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.github.nextcloud:android-library:1.0.27'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.github.nextcloud:android-library:1.0.31'
+    compile 'org.greenrobot:eventbus:3.1.1'
 }

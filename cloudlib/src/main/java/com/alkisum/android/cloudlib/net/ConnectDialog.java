@@ -19,7 +19,7 @@ import com.alkisum.android.cloudlib.utils.CloudPref;
  * Dialog to connect to a ownCloud server.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.4
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -111,6 +111,7 @@ public class ConnectDialog extends DialogFragment {
         addressEditText.setText(sharedPref.getString(CloudPref.ADDRESS, ""));
         pathEditText.setText(sharedPref.getString(CloudPref.PATH, ""));
         usernameEditText.setText(sharedPref.getString(CloudPref.USERNAME, ""));
+        passwordEditText.setText(sharedPref.getString(CloudPref.PASSWORD, ""));
 
         builder.setView(view)
                 .setTitle(R.string.connect_title)
@@ -129,10 +130,7 @@ public class ConnectDialog extends DialogFragment {
                                     callback.onSubmit(operation, info);
                                 }
 
-                                if (sharedPref.getBoolean(
-                                        CloudPref.SAVE_CLOUD_INFO, false)) {
-                                    saveConnectInfo(info);
-                                }
+                                saveConnectInfo(info);
 
                             }
                         })
@@ -147,16 +145,29 @@ public class ConnectDialog extends DialogFragment {
     }
 
     /**
-     * Save the connection information (server address, remote path and
-     * username) into the SharedPreferences to pre-fill the connect dialog.
+     * Save the connection information into the SharedPreferences
+     * to pre-fill the connect dialog.
      *
      * @param connectInfo Connection information
      */
     private void saveConnectInfo(final ConnectInfo connectInfo) {
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(CloudPref.ADDRESS, connectInfo.getAddress());
-        editor.putString(CloudPref.PATH, connectInfo.getPath());
-        editor.putString(CloudPref.USERNAME, connectInfo.getUsername());
+        if (sharedPref.getBoolean(CloudPref.SAVE_ADDRESS,
+                CloudPref.DEFAULT_SAVE_ADDRESS)) {
+            editor.putString(CloudPref.ADDRESS, connectInfo.getAddress());
+        }
+        if (sharedPref.getBoolean(CloudPref.SAVE_PATH,
+                CloudPref.DEFAULT_SAVE_PATH)) {
+            editor.putString(CloudPref.PATH, connectInfo.getPath());
+        }
+        if (sharedPref.getBoolean(CloudPref.SAVE_USERNAME,
+                CloudPref.DEFAULT_SAVE_USERNAME)) {
+            editor.putString(CloudPref.USERNAME, connectInfo.getUsername());
+        }
+        if (sharedPref.getBoolean(CloudPref.SAVE_PASSWORD,
+                CloudPref.DEFAULT_SAVE_PASSWORD)) {
+            editor.putString(CloudPref.PASSWORD, connectInfo.getPassword());
+        }
         editor.apply();
     }
 

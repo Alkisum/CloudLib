@@ -13,9 +13,11 @@
     <!-- OcDownloader -->
     <string name="downloader_downloading">Downloading&#160;</string>
     <string name="downloader_complete">Download complete</string>
+    <string name="downloader_failed">Download failed</string>
 
     <!-- OcUploader -->
     <string name="uploader_uploading">Uploading&#160;</string>
     <string name="uploader_complete">Upload complete</string>
+    <string name="uploader_failed">Upload failed</string>
 
 </resources>

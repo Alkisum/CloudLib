@@ -25,7 +25,7 @@ import java.util.Queue;
  * Class uploading files to the server.
  *
  * @author Alkisum
- * @version 1.3
+ * @version 1.6
  * @since 1.0
  */
 public class NcUploader extends NcOperator implements OnRemoteOperationListener,
@@ -162,6 +162,13 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
         if (result.isSuccess()) {
             onUploadRemoteFileFinish();
         } else {
+            getNotifier().setIcon(
+                    android.R.drawable.stat_sys_upload_done);
+            getNotifier().setAutoCancel(true);
+            getNotifier().setTitle(getContext().getString(
+                    R.string.uploader_failed));
+            getNotifier().setProgress(100);
+            getNotifier().show();
             Log.e(TAG, result.getLogMessage(), result.getException());
             eventBus.post(new UploadEvent(subscriberIds, UploadEvent.ERROR,
                     result.getLogMessage()));

@@ -19,7 +19,7 @@ import com.alkisum.android.cloudlib.utils.CloudPref;
  * Dialog to connect to a ownCloud server.
  *
  * @author Alkisum
- * @version 1.4
+ * @version 1.6
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -97,6 +97,10 @@ public class ConnectDialog extends DialogFragment {
     @NonNull
     @Override
     public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+        if (getArguments() == null) {
+            throw new IllegalArgumentException(
+                    "Argument " + ARG_OPERATION + " required");
+        }
         final int operation = getArguments().getInt(ARG_OPERATION);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

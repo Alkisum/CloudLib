@@ -22,7 +22,8 @@
         android:layout_marginEnd="4dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
-        android:hint="@string/connect_hint_path"/>
+        android:hint="@string/connect_hint_path"
+        android:inputType="text"/>
 
     <EditText
         android:id="@+id/username"

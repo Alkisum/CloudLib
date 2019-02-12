@@ -1,6 +1,6 @@
 package com.alkisum.android.cloudlib.utils;
 
-import com.owncloud.android.lib.resources.files.RemoteFile;
+import com.owncloud.android.lib.resources.files.model.RemoteFile;
 
 /**
  * Utility class of ownCloud operations.

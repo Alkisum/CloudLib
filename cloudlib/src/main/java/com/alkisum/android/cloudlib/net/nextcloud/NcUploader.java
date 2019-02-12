@@ -14,7 +14,7 @@ import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
 import com.owncloud.android.lib.resources.files.FileUtils;
-import com.owncloud.android.lib.resources.files.UploadRemoteFileOperation;
+import com.owncloud.android.lib.resources.files.UploadFileRemoteOperation;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -109,12 +109,12 @@ public class NcUploader extends NcOperator implements OnRemoteOperationListener,
         Long timeStampLong = fileToUpload.lastModified() / 1000;
         String timeStamp = timeStampLong.toString();
 
-        UploadRemoteFileOperation op = new UploadRemoteFileOperation(
+        UploadFileRemoteOperation op = new UploadFileRemoteOperation(
                 fileToUpload.getAbsolutePath(),
                 path,
                 mimeType,
                 timeStamp);
-        op.addDatatransferProgressListener(this);
+        op.addDataTransferProgressListener(this);
         op.execute(getClient(), this, getHandler());
     }
 

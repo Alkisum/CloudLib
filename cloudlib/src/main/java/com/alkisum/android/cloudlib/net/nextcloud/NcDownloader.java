@@ -13,10 +13,10 @@ import com.owncloud.android.lib.common.network.OnDatatransferProgressListener;
 import com.owncloud.android.lib.common.operations.OnRemoteOperationListener;
 import com.owncloud.android.lib.common.operations.RemoteOperation;
 import com.owncloud.android.lib.common.operations.RemoteOperationResult;
-import com.owncloud.android.lib.resources.files.DownloadRemoteFileOperation;
+import com.owncloud.android.lib.resources.files.DownloadFileRemoteOperation;
 import com.owncloud.android.lib.resources.files.FileUtils;
-import com.owncloud.android.lib.resources.files.ReadRemoteFolderOperation;
-import com.owncloud.android.lib.resources.files.RemoteFile;
+import com.owncloud.android.lib.resources.files.ReadFolderRemoteOperation;
+import com.owncloud.android.lib.resources.files.model.RemoteFile;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -134,8 +134,8 @@ public class NcDownloader extends NcOperator implements
      * List all remote files contained in the remote path directory.
      */
     private void getRemoteFiles() {
-        ReadRemoteFolderOperation readOperation =
-                new ReadRemoteFolderOperation(remotePath);
+        ReadFolderRemoteOperation readOperation =
+                new ReadFolderRemoteOperation(remotePath);
         readOperation.execute(getClient(), this, getHandler());
     }
 
@@ -152,8 +152,8 @@ public class NcDownloader extends NcOperator implements
                 file.getModifiedTimestamp());
         cloudFiles.add(cloudFile);
 
-        DownloadRemoteFileOperation downloadOperation =
-                new DownloadRemoteFileOperation(file.getRemotePath(),
+        DownloadFileRemoteOperation downloadOperation =
+                new DownloadFileRemoteOperation(file.getRemotePath(),
                         getContext().getCacheDir().getAbsolutePath());
         downloadOperation.addDatatransferProgressListener(this);
         downloadOperation.execute(getClient(), this, getHandler());
@@ -181,9 +181,9 @@ public class NcDownloader extends NcOperator implements
             final RemoteOperation operation,
             final RemoteOperationResult result) {
         if (result.isSuccess()) {
-            if (operation instanceof ReadRemoteFolderOperation) {
+            if (operation instanceof ReadFolderRemoteOperation) {
                 onReadRemoteFolderFinish(result);
-            } else if (operation instanceof DownloadRemoteFileOperation) {
+            } else if (operation instanceof DownloadFileRemoteOperation) {
                 onDownloadRemoteFileFinish();
             }
         } else {

@@ -3,23 +3,23 @@ package com.alkisum.android.cloudlib.net;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import android.view.View;
 import android.widget.EditText;
 
 import com.alkisum.android.cloudlib.R;
 import com.alkisum.android.cloudlib.utils.CloudPref;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+
 /**
  * Dialog to connect to a ownCloud server.
  *
  * @author Alkisum
- * @version 1.6
+ * @version 1.8
  * @since 1.0
  */
 public class ConnectDialog extends DialogFragment {
@@ -80,7 +80,7 @@ public class ConnectDialog extends DialogFragment {
     }
 
     @Override
-    public final void onAttach(final Context context) {
+    public final void onAttach(@NonNull final Context context) {
         super.onAttach(context);
         sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
     }
@@ -120,28 +120,23 @@ public class ConnectDialog extends DialogFragment {
         builder.setView(view)
                 .setTitle(R.string.connect_title)
                 .setPositiveButton(R.string.action_connect,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialog,
-                                                final int id) {
-                                ConnectInfo info = new ConnectInfo(
-                                        addressEditText.getText().toString(),
-                                        pathEditText.getText().toString(),
-                                        usernameEditText.getText().toString(),
-                                        passwordEditText.getText().toString()
-                                );
-                                if (callback != null) {
-                                    callback.onSubmit(operation, info);
-                                }
-
-                                saveConnectInfo(info);
-
+                        (dialog, id) -> {
+                            ConnectInfo info = new ConnectInfo(
+                                    addressEditText.getText().toString(),
+                                    pathEditText.getText().toString(),
+                                    usernameEditText.getText().toString(),
+                                    passwordEditText.getText().toString()
+                            );
+                            if (callback != null) {
+                                callback.onSubmit(operation, info);
                             }
+
+                            saveConnectInfo(info);
+
                         })
                 .setNegativeButton(android.R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog,
-                                                final int id) {
+                        (dialog, id) -> {
+                            if (ConnectDialog.this.getDialog() != null) {
                                 ConnectDialog.this.getDialog().cancel();
                             }
                         });

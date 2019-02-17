@@ -6,7 +6,7 @@ import com.owncloud.android.lib.resources.files.model.RemoteFile;
  * Utility class of ownCloud operations.
  *
  * @author Alkisum
- * @version 1.2
+ * @version 1.8
  * @since 1.2
  */
 public final class OcUtils {

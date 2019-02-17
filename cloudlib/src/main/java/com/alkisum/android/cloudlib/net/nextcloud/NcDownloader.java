@@ -30,7 +30,7 @@ import java.util.Queue;
  * Class downloading files from an Nextcloud server.
  *
  * @author Alkisum
- * @version 1.6
+ * @version 1.8
  * @since 1.0
  */
 public class NcDownloader extends NcOperator implements
@@ -243,17 +243,14 @@ public class NcDownloader extends NcOperator implements
             eventBus.post(new DownloadEvent(subscriberIds,
                     DownloadEvent.DOWNLOADING));
         } else {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    getNotifier().setIcon(
-                            android.R.drawable.stat_sys_download_done);
-                    getNotifier().setAutoCancel(true);
-                    getNotifier().setTitle(getContext().getString(
-                            R.string.downloader_complete));
-                    getNotifier().setProgress(100);
-                    getNotifier().show();
-                }
+            new Handler().postDelayed(() -> {
+                getNotifier().setIcon(
+                        android.R.drawable.stat_sys_download_done);
+                getNotifier().setAutoCancel(true);
+                getNotifier().setTitle(getContext().getString(
+                        R.string.downloader_complete));
+                getNotifier().setProgress(100);
+                getNotifier().show();
             }, 100);
             eventBus.post(new DownloadEvent(subscriberIds, DownloadEvent.OK,
                     cloudFiles));
